@@ -1,0 +1,42 @@
+event onLoad(){
+            //Logging
+          server.log("------------------------------------");
+          server.log("-------[Dark's RVL]--------");
+          server.log("-------[Successfully Loaded]--------");
+          server.log("----------[By: DarkFox] ------------");
+          server.log("------------------------------------");
+          };
+
+event onPlayerEnterVehicle(player, vehicle, cancel){
+	if(vehicle.locked == false){
+		cancel = false;
+	}
+	else {
+		cancel = true;
+		player.message("This vehicle is locked, you need to unlock it to get in this vehicle!", "blue");
+	}
+}
+
+event onPlayerLeaveVehicle(player, vehicle, cancel){
+	if(vehicle.locked == false){
+		cancel = false;
+	}
+	else {
+		cancel = true;
+		player.message("This vehicle is locked, you need to unlock it to leave this vehicle!", "blue");
+	}
+}
+
+event onPlayerGestured(player, gesture){
+	if(gesture == "PunchLeft" or gesture == "PunchRight"){
+		vv = player.look.getVehicle();
+		if(vv.group == player.steamGroup or vv.owner == player.id){
+			if(vv.locked == false){
+				vv.locked = true;
+			}
+			else {
+				vv.locked = false;
+			}
+		}
+	}
+}

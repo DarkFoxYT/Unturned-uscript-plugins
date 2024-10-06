@@ -1,0 +1,83 @@
+event onLoad(){
+            //Logging
+          server.log("------------------------------------");
+          server.log("-------[Dark's warn system]--------");
+          server.log("-------[Successfully Loaded]--------");
+          server.log("----------[By: DarkFox] ------------");
+          server.log("------------------------------------");
+          };
+
+event onLoad(){
+	database.execute("CREATE TABLE playerwarnings(
+		Id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		StaffSteamID VARCHAR(17),
+		StaffName VARCHAR(255),
+		PlayerSteamID VARCHAR(17),
+		PlayerName VARCHAR(255),
+		Reason VARCHAR(255),
+		TimeStamp DATETIME
+
+	);");
+	database.execute("CREATE TABLE playerinfo(
+		Id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		SteamID VARCHAR(17),
+		PlayerName VARCHAR(255),
+		Warnings INT(11) NOT NULL DEFAULT 0
+	);");
+}
+
+
+
+command warn(arg, reason){
+	permission = "warn";
+	execute() {
+		if(isSet(arg)){
+			if(isSet(reason)){
+			argPlayer = toPlayer(arg);
+			argReason = toString(reason);
+			database.execute("INSERT INTO playerwarnings (StaffSteamID,StaffName,PlayerSteamID,PlayerName,Reason,TimeStamp) VALUES ('" + player.id +"','" + player.name + "','" + argPlayer.id + "','" + argPlayer.name + "','" + argReason + "', '" + dt.now.string + "')");
+			player.message("You warned " + argPlayer.name + " with the reason " + argReason);
+			argPlayer.message("You have been warned by " + player.name + " with the reason " + argReason);
+			database.execute(str.format("UPDATE playerinfo SET Warnings = Warnings + 1 WHERE SteamID = '{0}';",argPlayer.id));
+			return;
+			}
+			player.message("Add a Reason for the Warn");
+			return;
+		}
+		player.message("Fail! Use the format: /warn <player> <reason>");
+	}
+}
+
+command warns(arg){
+	permission = "warns";
+	execute() {
+		if(isSet(arg)){
+			argPlayer = toPlayer(arg);
+			y = database.execute(str.format("SELECT * FROM playerinfo WHERE SteamID = '{0}';",argPlayer.id));
+			y = y[0];
+			playerWarns = y[3];
+			player.message("That player has " + playerWarns + " warnings!");
+			return;
+		}
+		y = database.execute(str.format("SELECT * FROM playerinfo WHERE SteamID = '{0}';",player.id));
+		y = y[0];
+		playerWarns = y[3];
+		player.message("You have " + playerWarns + " warnings!");
+	}
+}
+
+command clearwarns(arg){
+	permission = "clearwarns";
+	execute() {
+		if(isSet(arg)){
+			argPlayer = toPlayer(arg);
+			Reason = "Clear Warnings";
+			database.execute("INSERT INTO playerwarnings (StaffSteamID,StaffName,PlayerSteamID,PlayerName,Reason,TimeStamp) VALUES ('" + player.id +"','" + player.name + "','" + argPlayer.id + "','" + argPlayer.name + "','" + Reason + "', '" + dt.now.string + "')");
+			player.message("You cleared " + argPlayer.name + "'s  warnings");
+			argPlayer.message("Your warnings have been cleared by " + player.name);
+			database.execute(str.format("UPDATE playerinfo SET Warnings = 0 WHERE SteamID = '{0}';",argPlayer.id));
+			return;
+		}
+		player.message("Failed! Use the format: /clearwarns <player>");
+	}
+}

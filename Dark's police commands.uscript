@@ -1,0 +1,187 @@
+ScriptVersion = "1.2.1";
+event onLoad(){
+    server.log("----------------------------------");
+    server.log("----------[ darks pd Loaded ]--------");
+    server.log("--------[Successfully Loaded]-------");
+    server.log("---------[Version " + ScriptVersion + "]-------");
+    server.log("------------[By: DarkFox] -----------");
+    server.log("-----------------------------------");
+}
+
+
+immunityPermission = "search.immunity.darkpd"; //Change to any desirable permission name
+maxdistance = 10; // You can change this to set the max inspection distance
+
+// You can change these if you have any mods that adds drugs
+drugs = array(115, 270, 271, 272, 273, 274, 275, 396, 397, 398, 399, 400, 401, 402, 4758, 4739, 4740,4741,4748, 4735, 4755, 4734, 4756, 4745, 4746, 4747, 4749, 4737, 4743, 4757, 4736, 4759);
+
+AmmoCrates = array(1192, 43, 119, 1193, 44); //Unnused as of now
+
+drugSeeds = array(1104, 1105, 1106, 1107, 1108, 1109, 1110, 4744, 4738);
+
+
+
+
+
+command search(arg){
+    permission = "search.darkpd";
+    execute(){
+           if(arg == null){
+            target = player.look.getPlayer();
+                    if(target != null){
+                      if(target.hasPermission(immunityPermission) == false){
+                        if(target.arrested == true){
+                            target.message(player.name + " is inspecting you!", "red");
+                            player.message("You're inspecting " + target.name);
+                            foreach(gun in target.inventory.items){
+                                if(gun.itemType == "GUN"){
+                                    player.message("ATTENTION! " + target.name + " has a "+ gun.name +"!", "red");
+
+                                }
+                            }
+                            foreach(melee in target.inventory.items){
+                                if(melee.itemType == "MELEE"){
+                                    player.message("ATTENTION! " + target.name + " has a "+ melee.name +"!", "red");
+
+                                }
+                            }
+                            foreach(drug in target.inventory.items){
+                                if(drugs.contains(drug.id)){
+                                    player.message("ATTENTION! " + target.name + " has a "+drug.name+"!", "red");
+
+
+                                }
+                            }
+                                                        foreach(ammo in target.inventory.items){
+
+                                if(AmmoCrates.contains(ammo.id)){
+
+                                    player.message("ATTENTION! " + target.name + " has a "+ ammo.name +"!", "red");
+
+                                }
+                            }
+                            foreach(drugseed in target.inventory.items){
+                                if(drugSeeds.contains(drugseed.id)){
+                                    player.message("ATTENTION! " + target.name + " has a "+ drugseed.name+"!", "red");
+
+
+                                }
+                            }
+                            foreach(magazine in target.inventory.items){
+                                if(magazine.itemType == "MAGAZINE"){
+                                    player.message("ATTENTION! " + target.name + " has a "+magazine.name+"!", "red");
+
+
+                                }
+                            }
+                        }
+                        else{
+                            player.message("The target player isn't arrested!", "red");
+                        }
+                    }
+                    else{
+                        player.message("That player is immune", "red");
+                    }
+                }
+                else{
+                     player.message("You have to be looking at a player!", "red");
+                }
+
+            }
+             else{
+                  target = toPlayer(arg);
+                   if(target != null){
+                     playerPos = player.position;
+                      if(playerPos.distance(target.position) <= maxdistance){
+                        if(target.hasPermission(immunityPermission) == false){
+                          if(target.arrested != true){
+                            target.message(player.name + " is inspecting you!", "red");
+                            player.message("You're inspecting " + target.name);
+                            foreach(gun in target.inventory.items){
+                                if(gun.itemType == "GUN"){
+                                    player.message("ATTENTION! " + target.name + " has a "+ gun.name +"!", "red");
+
+                                }
+                            }
+                            foreach(melee in target.inventory.items){
+                                if(melee.itemType == "MELEE"){
+                                    player.message("ATTENTION! " + target.name + " has a "+ melee.name +"!", "red");
+
+                                }
+                            }
+                            foreach(drug in target.inventory.items){
+                                if(drugs.contains(drug.id)){
+                                    player.message("ATTENTION! " + target.name + " has a drug!", "red");
+
+                                }
+                            }
+                            foreach(drugseed in target.inventory.items){
+                                if(drugSeeds.contains(drugseed.id)){
+                                    player.message("ATTENTION! " + target.name + " has a drug seed!", "red");
+
+                                }
+                            }
+                            foreach(magazine in target.inventory.items){
+                                if(magazine.itemType == "MAGAZINE"){
+                                    player.message("ATTENTION! " + target.name + " has a magazine!", "red");
+                                    break;
+
+                                }
+                            }
+                        }
+                        else{
+                            player.message("The target player isn't arrested!", "red");
+                        }
+                    }
+                    else{
+                        player.message("That player is immune", "red");
+                    }
+                  }
+                  else{
+                       player.message("Player is too far away!", "red");
+                  }
+                }
+                else{
+                     player.message("Failed to convert"+ arg +" to a player", "red");
+                }
+             }
+
+    }
+}
+
+command fine(arg, arg1, arg2){
+    permission = "police.fine";
+    execute(){
+        if(isSet(arg) == false){
+          player.message("Proper Usage: /fine (player) (amount) (reason)", "red");
+        }
+        else{
+            if(isSet(arg1) == false){
+              player.message("Proper Usage: /fine (player) (amount) (reason)", "red");
+            }
+            else{
+                if(isSet(arg2) == false){
+                    player.message("Proper Usage: /fine (player) (amount) (reason)", "red");
+                }
+                else{
+                    if(arg1 > 100000){
+                        player.message("Fine cannot exceed 100,000", "red");
+                    }
+                    else{
+                      victim = toPlayer(arg);
+                      if(isPlayer(victim)){
+                        victim.decreaseBalance(arg1);
+                        player.increaseBalance(arg1);
+                        victim.message("You been fined $" + arg1 + " by " + player.name + "for " + arg2 + "!", "yellow");
+                        player.message("You have fined " + victim.name +" $"+ arg1 + "for " + arg2 + "!", "yellow");
+                        discord.send("**Fine** | " + player.name + " has fined " + victim.name + arg1 + "for " + arg2 , "CHANGE_ME_WEBHOOK_URL", "Police Fines", "CHANGE_ME_WEBHOOK_ICON");
+                      }
+                      else{
+                        player.message("Could Not Find That Player!", "red");
+                      }
+                    }
+                }
+            }
+        }
+    }
+}

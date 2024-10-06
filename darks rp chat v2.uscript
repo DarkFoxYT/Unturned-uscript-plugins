@@ -1,0 +1,137 @@
+event onLoad(){
+            //Logging
+          server.log("------------------------------------");
+          server.log("---------[ Easy RP Chat]---------");
+          server.log("-------[Successfully Loaded]--------");
+          server.log("-----------[By: DarkFox] ------------");
+          server.log("------------------------------------");
+          };
+
+              //config
+            config = {
+            "permission_prefix": "RP",
+            "correctUsageOOC": "/ooc <message>",
+            "correctUsage911": "/pol <message>",
+            "correctUsageAnon": "/anon <message>",
+            "messageIcon": "https://www.iconninja.com/files/823/33/273/comment-bubbles-chat-messages-icon.png",
+            "oocIcon": "https://i.imgur.com/SSWIvgh.png",
+            "TwitterIcon": "https://i.imgur.com/vYLoTGW.png",
+            "911Icon": "https://i.imgur.com/WOFowA6.png",
+            "show_range": "30"
+            };
+
+          command pol(arg1){
+              permission = "msg.dark";
+              allowedCaller = "player";
+              execute(){
+                  if(arguments.count < 1){
+                      player.message(config["correctUsage911"], "red");
+                      return;
+                  }
+                  foreach(loopPlayer in server.players){
+                      if(loopPlayer.hasPermission("Police")){
+                      loopPlayer.message("<color=#808080>911 | <b>{1} Needs your help</b>:  <i>{0}</i></color>".format(arguments.join(" "), player.name), "blue", config["911Icon"]);
+                      }
+                  }
+              }
+          }
+
+
+          command ooc(arg){
+              permission = "msg.dark";
+              allowedCaller = "player";
+              execute(){
+                  if(arguments.count < 1){
+                      player.message(config["correctUsageOOC"], "red");
+                      return;
+                  }
+                  foreach(loopPlayer in server.players){
+                      loopPlayer.message("<color=#808080>OOC | <b>{1}</b>:  <i>{0}</i></color>".format(arguments.join(" "), player.name), "white", config["oocIcon"]);
+
+                  }
+              }
+          }
+
+          command anon(arg){
+              permission = "msg.dark";
+              allowedCaller = "player";
+              execute(){
+                  if(arguments.count < 1){
+                      player.message(config["correctUsageAnon"], "red");
+                      return;
+                  }else{
+                  discord.send("***Anonymous |*** *__{1}:__* {0}".format(arguments.join(" "), player.name), "YOUR DISCORD WEBHOOK GOES HERE", "|Anonymous|", "https://i.imgur.com/AfYFjGE.png");
+                  foreach(loopPlayer in server.players){
+                      if(loopPlayer.hasPermission("police")){}else{
+                      if(loopPlayer.hasPermission("staff")){
+                      loopPlayer.message("<color=#0d0d0d><b>[{1}]</b>:</color> {0}".format(arguments.join(" "), player.name), "red", "https://i.imgur.com/AfYFjGE.png");
+                      }
+                      else{
+                      loopPlayer.message("<color=#0d0d0d><b>[Anônimo]</b>:</color> {0}".format(arguments.join(" "), player.name), "red", "https://i.imgur.com/AfYFjGE.png");
+                      }
+
+                  }
+              }}}
+          }
+
+          event onPlayerChatted(player, message, chatMode, color, cancel){
+              test = toString(message);
+                             if(test.startsWith("/") == true){
+                             cancel = false;
+                             }else{
+           format = "<color=red>[ADMIN] </color><color=#87ffdd>" + player.name + ": " + "</color><color=white>" + message + "</color>";
+           if(player.isAdmin){
+                           if(chatMode == "GROUP"){ cancel = false; return;}
+                           else{
+                           if(test.startsWith(";") == true) {
+                               cancel = true;
+                               foreach (reciever in server.players){
+                                   if(reciever.isAdmin or reciever.hasPermission("staff")){
+                                   reciever.message("<b><color=#00ee77>[Admin Chat]</color></b> <color=#"+ color +">{1}:</color>  {0}".format(message.replace(";", ""), player.name), "white", config["messageIcon"]);
+                                   }
+                            }
+                           }else
+                            if(chatMode == "GLOBAL"){
+                              cancel = true;
+                              foreach (reciever in server.players){
+                                reciever.message(format, config["messageIcon"]);
+                            }
+                          }
+                          else{ if (chatMode == "LOCAL"){
+                          cancel = true;
+                           foreach (loopPlayer in server.players){
+                              ShowRange = config["show_range"].toNumber();
+                              if(player.position.distance(loopPlayer.position) < ShowRange){
+                                 loopPlayer.message("[A] " + format, config["messageIcon"]);
+                              }
+                           }
+
+                               }
+                          }
+                            }
+                       }else{
+                        if(chatMode == "GROUP"){ cancel = false; return;}
+                          else{
+                           cancel = true;
+                           if(chatMode == "GLOBAL"){
+                             foreach(loopPlayer in server.players){
+                              loopPlayer.message("<color=#00acee>Tweet</color><color=white> | </color><color=#"+ color +"><b>@{1}</b>:</color> {0}".format(message, player.name), "white", config["TwitterIcon"]);
+                              }
+                             }
+                             else{
+                                  if(chatMode == "LOCAL"){
+                                    ShowRange = config["show_range"].toNumber();
+                                    foreach(loopPlayer in server.players){
+                                      if(player.position.distance(loopPlayer.position) < ShowRange){
+                                          loopPlayer.message("<b><color=#"+ color +">{1}:</color></b>  {0}".format(message, player.name), "white", config["messageIcon"]);
+                                      }
+                                    }
+                                  }
+
+                              }
+                          }
+
+                   }
+                  }
+
+          }

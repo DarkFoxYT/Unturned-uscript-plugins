@@ -1,0 +1,52 @@
+event onLoad(){
+            //Logging
+          server.log("------------------------------------");
+          server.log("-------[Dark's True Pain]--------");
+          server.log("-------[Successfully Loaded]--------");
+          server.log("----------[By: DarkFox] ------------");
+          server.log("------------------------------------");
+          };
+
+ 
+effect_lowhp = 37401 ; // Effect ID   Customizable
+effect_lowstam = 37402 ;  // Effect ID Customizable
+ 
+ 
+event onPlayerJoined(player){
+        if(player.health < 100 and player.health > 35 or player.health == 100){        
+            effectManager.clearUIById(effect_lowhp, player.id);
+            effectManager.clearUIById(effect_lowstam, player.id);
+        }
+        else if(player.health < 35 and player.health > 1 or player.health == 1){
+            effectManager.sendUI(effect_lowhp, 5, player.id);
+            effectManager.sendUI(effect_lowstam, 6, player.id);
+        }
+}
+event onInterval(2){
+    foreach(player in server.players){
+        if(player.health < 100 and player.health > 35 or player.health == 100){        
+            effectManager.clearUIById(effect_lowhp, player.id);
+            effectManager.clearUIById(effect_lowstam, player.id);
+        }
+        else if(player.health < 35 and player.health > 1 or player.health == 1){
+            effectManager.sendUI(effect_lowhp, 5, player.id);
+            effectManager.sendUI(effect_lowstam, 6, player.id);
+        }
+    }
+}
+ 
+ 
+event onPlayerRespawned(player, position){ 
+    effectManager.clearUIById(effect_lowhp, player.id); 
+    effectManager.clearUIById(effect_lowstam, player.id); 
+}
+event onAid(player, target, id){
+    effectManager.clearUIById(effect_lowhp, target.id); 
+    effectManager.clearUIById(effect_lowstam, target.id); 
+}
+event onConsume(player, item, type){
+     if(itemManager.getItemType(item.id) == "MEDICAL"){
+             effectManager.clearUIById(effect_lowhp, target.id); 
+             effectManager.clearUIById(effect_lowstam, target.id); 
+     }
+}
