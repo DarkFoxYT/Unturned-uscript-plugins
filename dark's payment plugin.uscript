@@ -1,0 +1,60 @@
+TransferWebhookURL = "https://discord.com/api/webhooks/XXXXXXXXXXX";
+translations = {
+    IncorrectUsage: "Incorrect Usage: /pay <player>",
+    PlayerNotFound: "Player not found.",
+    InsufficientFunds: "Insufficient Funds!",
+    SelfPay: "You cannot pay yourself."
+};
+cfg = {
+    message_color: "blue",
+    error_color: "red"
+};
+event onLoad(){
+    print("-------------------\n[ Darks-Pay ]\n-------------------\nAuthor: DarkFox\n-------------------\n");
+    modifyhook = discordEmbed();
+    modifyhook.title = "> Darks-Pay loaded! | {0}".format(time.now.toString());
+    modifyhook.footer.text = "Darks-Pay | Script by DarkFox";
+    discord.sendEmbed(TransferWebhookURL, modifyhook);
+}
+command pay(argPlayer, amount){
+	permission = "pay";
+    allowedCaller("player");
+    execute(){
+        if(player == null){
+            logger.log("You're a console!");
+            return;
+        }
+        if(argPlayer == null){
+		    return player.message("Incorrect Usage: /pay <amount> <player>", cfg["error_color"]);
+        }
+		argPlayer = toPlayer(argPlayer);
+		if(argPlayer == null){
+			return player.message(translations["PlayerNotFound"], cfg["error_color"]);
+        }
+        if(argPlayer.name == player.name){
+        	return player.message(translations["SelfPay"], cfg["error_color"]);
+        }
+        if(player.experience < amount.toNumber()){
+            return player.message(translations["InsufficientFunds"], cfg["error_color"]);
+        }
+        xp = argPlayer.experience;
+        logger.log("ARGPLAYER EXP BEFORE: "+xp.toString());
+        argPlayer.experience = xp += amount.toNumber();
+        logger.log("ARGPLAYER EXP AFTER: "+argPlayer.experience.toString());
+        lxp = player.experience;
+        logger.log("PLAYER EXP BEFORE: "+lxp.toString());
+        player.experience = lxp -= amount.toNumber();
+		logger.log("PLAYER EXP AFTER: "+player.experience.toString());
+		player.message("You have made a bank Payment. Sent: {0}, Current total: {1}".format(amount.toString(), player.experience.toString()), cfg["message_color"]);
+        argPlayer.message("You have received money. Received: {0}, Current total: {1}".format(amount.toString(), argPlayer.experience.toString()), cfg["message_color"]);
+        if(amount.toNumber() > 100){
+            TransferHook = discordEmbed();
+            TransferHook.title = "Darks-Pay | Large transaction detected.";
+            TransferHook.description = "Transfered money amount: {0}$ | Time of transaction: {3} | Transaction from: {1} | Transaction to: {2}".format(amount, player.name, argPlayer.name, time.now.toString());
+            TransferHook.color = 5776348;
+            TransferHook.author.name = "DarkFox";
+            TransferHook.footer.text = "Darks-pay | Script by DarkFox | https://discord.gg/Kp4hXM4EQt";
+            discord.sendEmbed(TransferWebhookURL, TransferHook);
+       	}
+	}
+}
